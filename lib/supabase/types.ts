@@ -1,0 +1,211 @@
+// lib/supabase/types.ts
+// Typed to match our 001_initial_schema.sql migration exactly.
+// You can regenerate this automatically by running:
+//   npx supabase gen types typescript --project-id YOUR_PROJECT_ID > lib/supabase/types.ts
+
+export type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[]
+
+export interface Database {
+  public: {
+    Tables: {
+      roots: {
+        Row: {
+          id: string
+          name: string
+          canvas_x: number
+          canvas_y: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          canvas_x?: number
+          canvas_y?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          canvas_x?: number
+          canvas_y?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      people: {
+        Row: {
+          id: string
+          name: string
+          nickname: string | null
+          birth_date: string | null
+          bio: string | null
+          photo_url: string | null
+          mother_id: string | null
+          root_id: string
+          gender: 'male' | 'female' | null
+          is_shortcut: boolean
+          original_person_id: string | null
+          canvas_x: number
+          canvas_y: number
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          name: string
+          nickname?: string | null
+          birth_date?: string | null
+          bio?: string | null
+          photo_url?: string | null
+          mother_id?: string | null
+          root_id: string
+          gender?: 'male' | 'female' | null
+          is_shortcut?: boolean
+          original_person_id?: string | null
+          canvas_x?: number
+          canvas_y?: number
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          name?: string
+          nickname?: string | null
+          birth_date?: string | null
+          bio?: string | null
+          photo_url?: string | null
+          mother_id?: string | null
+          root_id?: string
+          gender?: 'male' | 'female' | null
+          is_shortcut?: boolean
+          original_person_id?: string | null
+          canvas_x?: number
+          canvas_y?: number
+          created_at?: string
+          updated_at?: string
+        }
+      }
+      partnerships: {
+        Row: {
+          id: string
+          person_a_id: string
+          person_b_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          person_a_id: string
+          person_b_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          person_a_id?: string
+          person_b_id?: string
+          created_at?: string
+        }
+      }
+      parent_child: {
+        Row: {
+          id: string
+          parent_id: string
+          child_id: string
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          parent_id: string
+          child_id: string
+          created_at?: string
+        }
+        Update: {
+          id?: string
+          parent_id?: string
+          child_id?: string
+          created_at?: string
+        }
+      }
+    }
+    Views: {
+      people_with_root: {
+        Row: {
+          id: string
+          name: string
+          nickname: string | null
+          birth_date: string | null
+          bio: string | null
+          photo_url: string | null
+          mother_id: string | null
+          root_id: string
+          root_name: string
+          is_shortcut: boolean
+          original_person_id: string | null
+          canvas_x: number
+          canvas_y: number
+          created_at: string
+          updated_at: string
+        }
+      }
+      partnerships_detail: {
+        Row: {
+          id: string
+          person_a_id: string
+          person_a_name: string
+          person_b_id: string
+          person_b_name: string
+          created_at: string
+        }
+      }
+      parent_child_detail: {
+        Row: {
+          id: string
+          parent_id: string
+          parent_name: string
+          child_id: string
+          child_name: string
+          created_at: string
+        }
+      }
+    }
+    Functions: Record<string, never>
+    Enums: Record<string, never>
+  }
+}
+
+// ── Convenience type aliases ──────────────────────────────────────────────────
+
+export type Tables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Row']
+
+export type InsertTables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Insert']
+
+export type UpdateTables<T extends keyof Database['public']['Tables']> =
+  Database['public']['Tables'][T]['Update']
+
+export type Views<T extends keyof Database['public']['Views']> =
+  Database['public']['Views'][T]['Row']
+
+// Row types
+export type RootRow = Tables<'roots'>
+export type PersonRow = Tables<'people'>
+export type PartnershipRow = Tables<'partnerships'>
+export type ParentChildRow = Tables<'parent_child'>
+
+// Insert types
+export type InsertRoot = InsertTables<'roots'>
+export type InsertPerson = InsertTables<'people'>
+export type InsertPartnership = InsertTables<'partnerships'>
+export type InsertParentChild = InsertTables<'parent_child'>
+
+// Update types
+export type UpdatePerson = UpdateTables<'people'>
+export type UpdateRoot = UpdateTables<'roots'>

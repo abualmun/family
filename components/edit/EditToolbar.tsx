@@ -1,0 +1,118 @@
+'use client'
+
+interface EditToolbarProps {
+    onAddRoot: () => void
+    hasPendingChanges: boolean
+    isSaving: boolean
+    saveError: string | null
+    onSave: () => void
+}
+
+export default function EditToolbar({
+    onAddRoot,
+    hasPendingChanges,
+    isSaving,
+    saveError,
+    onSave,
+}: EditToolbarProps) {
+    return (
+        <>
+            {/* ── Save Changes button (top-right corner) ── */}
+            <div
+                data-no-pan
+                className="absolute top-5 right-5 z-20 flex flex-col items-end gap-2"
+            >
+                <button
+                    onClick={onSave}
+                    disabled={isSaving || !hasPendingChanges}
+                    className={`
+                        flex items-center gap-2.5
+                        px-9 py-5 rounded-2xl
+                        font-sans text-xl font-semibold
+                        shadow-md transition-all duration-150
+                        ${hasPendingChanges && !isSaving
+                            ? 'bg-walnut text-white hover:bg-walnut-dark cursor-pointer'
+                            : 'bg-white text-walnut-light border-2 border-slate-200 cursor-default'}
+                        ${isSaving ? 'opacity-60 cursor-wait' : ''}
+                    `}
+                >
+                    {isSaving ? (
+                        <>
+                            <svg
+                                className="animate-spin"
+                                width="18" height="18" viewBox="0 0 18 18" fill="none"
+                            >
+                                <circle
+                                    cx="9" cy="9" r="7"
+                                    stroke="currentColor" strokeWidth="2"
+                                    strokeDasharray="20 10" strokeLinecap="round"
+                                />
+                            </svg>
+                            جارٍ الحفظ…
+                        </>
+                    ) : (
+                        <>
+                            {hasPendingChanges && (
+                                <span className="w-2.5 h-2.5 rounded-full bg-gold" />
+                            )}
+                            حفظ
+                        </>
+                    )}
+                </button>
+
+                {/* Save error message */}
+                {saveError && !isSaving && (
+                    <p className="
+                        font-sans text-base font-medium text-red-700
+                        bg-white border-2 border-red-300
+                        rounded-xl px-5 py-3 shadow-sm
+                        max-w-xs text-right
+                    ">
+                        {saveError}
+                    </p>
+                )}
+            </div>
+
+            {/* ── Bottom toolbar (add root + hint) ── */}
+            <div
+                data-no-pan
+                className="
+                    absolute bottom-6 left-1/2 -translate-x-1/2 z-20
+                    flex items-center gap-3
+                    bg-white
+                    border-2 border-slate-200
+                    rounded-2xl shadow-popup
+                    px-5 py-4
+                "
+            >
+                {/* Add root */}
+                <button
+                    onClick={onAddRoot}
+                    className="
+                        flex items-center gap-2.5
+                        px-9 py-5 rounded-xl
+                        bg-walnut text-white
+                        font-sans text-xl font-semibold
+                        hover:bg-walnut-dark
+                        transition-colors duration-150
+                        shadow-sm
+                    "
+                >
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                        <circle cx="9" cy="9" r="7.5" stroke="currentColor" strokeWidth="1.8" />
+                        <path d="M9 5v8M5 9h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
+                    </svg>
+                    إضافة جذر عائلي
+                </button>
+
+                {/* Divider */}
+                <div className="w-0.5 h-7 bg-slate-200" />
+
+                {/* Hint text */}
+                <p className="font-sans text-base text-walnut-light pr-1 select-none">
+                    مرّر على عقدة لإضافة شركاء أو أبناء
+                </p>
+            </div>
+        </>
+    )
+}

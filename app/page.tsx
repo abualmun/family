@@ -1,65 +1,78 @@
-import Image from "next/image";
+import Link from 'next/link'
 
-export default function Home() {
+export default function LandingPage() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
+    <main className="min-h-screen bg-parchment flex flex-col items-center justify-center px-6">
+
+      {/* ── Icon ── */}
+      <div className="mb-8 animate-fade-up">
+        <div className="w-24 h-24 rounded-3xl bg-walnut flex items-center justify-center shadow-lg">
+          <svg width="52" height="52" viewBox="0 0 52 52" fill="none" aria-hidden>
+            <path
+              d="M26 6 C18 6, 8 14, 8 24 C8 32 14 38 20 40 L20 48 L32 48 L32 40 C38 38 44 32 44 24 C44 14 34 6 26 6Z"
+              fill="none"
+              stroke="white"
+              strokeWidth="2"
+              strokeLinejoin="round"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <path d="M26 48 L26 30" stroke="white" strokeWidth="2" strokeLinecap="round" />
+            <path d="M26 38 C22 36, 16 32, 14 26" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+            <path d="M26 34 C30 32, 36 28, 37 22" stroke="white" strokeWidth="1.5" strokeLinecap="round" />
+          </svg>
         </div>
-      </main>
-    </div>
-  );
+      </div>
+
+      {/* ── Title ── */}
+      <h1
+        className="font-sans text-5xl sm:text-6xl font-bold text-charcoal text-center leading-tight mb-4 animate-fade-up"
+        style={{ animationDelay: '0.08s' }}
+      >
+        شجرة عائلتنا
+      </h1>
+
+      {/* ── Subtitle ── */}
+      <p
+        className="font-sans text-xl text-walnut-light text-center max-w-md leading-relaxed mb-12 animate-fade-up"
+        style={{ animationDelay: '0.15s' }}
+      >
+        استكشف أجيالاً من التاريخ والقصص والروابط — كل ذلك في مكان واحد.
+      </p>
+
+      {/* ── Buttons ── */}
+      <div
+        className="flex flex-col sm:flex-row items-center gap-4 animate-fade-up"
+        style={{ animationDelay: '0.22s' }}
+      >
+        <Link
+          href="/view"
+          className="
+            flex items-center justify-center
+            w-64 sm:w-auto px-12 py-6
+            rounded-2xl bg-walnut text-white
+            font-sans text-xl font-semibold
+            shadow-lg hover:bg-walnut-dark
+            transition-colors duration-200
+          "
+        >
+          ادخل الشجرة
+        </Link>
+
+        <Link
+          href="/edit"
+          className="
+            flex items-center justify-center
+            w-64 sm:w-auto px-12 py-6
+            rounded-2xl bg-white text-walnut
+            font-sans text-xl font-semibold
+            border-2 border-walnut
+            shadow-md hover:bg-walnut hover:text-white
+            transition-colors duration-200
+          "
+        >
+          وضع التعديل
+        </Link>
+      </div>
+
+    </main>
+  )
 }
