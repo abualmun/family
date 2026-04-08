@@ -20,6 +20,7 @@ export const NODE_HEIGHT = 160
 export const H_GAP = 50    // horizontal gap between nodes on same level
 export const V_GAP = 100   // vertical gap between generations
 export const PARTNER_GAP = 24    // tight gap between a person and their partner(s)
+export const LEAF_V_GAP = 30     // vertical gap between vertically-stacked leaf siblings
 export const ROOT_OFFSET_X = 180  // base X offset between separate family roots
 
 // ── Public entry point ────────────────────────────────────────────────────────
@@ -148,7 +149,18 @@ function computeSubtreeWidth(node: TreeNode): number {
 
   if (node.children.length === 0) return coupleWidth
 
-  // Width of all children subtrees
+  // If all children are leaf nodes (no grandchildren), they stack vertically —
+  // no horizontal expansion needed, just the widest child couple.
+  const allChildrenAreLeaves = node.children.every(c => c.children.length === 0)
+  if (allChildrenAreLeaves) {
+    const maxChildCoupleWidth = Math.max(...node.children.map(c => {
+      const cc = 1 + c.partners.length
+      return cc * NODE_WIDTH + (cc - 1) * PARTNER_GAP
+    }))
+    return Math.max(coupleWidth, maxChildCoupleWidth)
+  }
+
+  // Width of all children subtrees (normal horizontal layout)
   const childrenTotalWidth = node.children.reduce((sum, child) => {
     return sum + computeSubtreeWidth(child)
   }, 0) + (node.children.length - 1) * H_GAP
@@ -188,17 +200,32 @@ function assignPositions(
 
   if (node.children.length === 0) return
 
-  // Total width needed for children row
+  const coupleMidX = coupleX + coupleWidth / 2
+  const childY = y + NODE_HEIGHT + V_GAP
+
+  // If all children are leaf nodes, stack them vertically to reduce horizontal sprawl
+  const allChildrenAreLeaves = node.children.every(c => c.children.length === 0)
+  if (allChildrenAreLeaves) {
+    const maxChildCoupleWidth = Math.max(...node.children.map(c => {
+      const cc = 1 + c.partners.length
+      return cc * NODE_WIDTH + (cc - 1) * PARTNER_GAP
+    }))
+    const stackLeft = coupleMidX - maxChildCoupleWidth / 2
+    let stackY = childY
+    for (const child of node.children) {
+      assignPositions(child, stackLeft, stackY, partnerMap, childrenMap, peopleById)
+      stackY += NODE_HEIGHT + LEAF_V_GAP
+    }
+    return
+  }
+
+  // Normal horizontal layout for children who have their own children
   const childrenWidths = node.children.map(computeSubtreeWidth)
   const totalChildrenWidth =
     childrenWidths.reduce((a, b) => a + b, 0) +
     (node.children.length - 1) * H_GAP
 
-  // Center children under the couple group
-  const coupleMidX = coupleX + coupleWidth / 2
   let childX = coupleMidX - totalChildrenWidth / 2
-
-  const childY = y + NODE_HEIGHT + V_GAP
 
   for (let i = 0; i < node.children.length; i++) {
     assignPositions(node.children[i], childX, childY, partnerMap, childrenMap, peopleById)
