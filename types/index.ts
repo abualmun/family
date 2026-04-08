@@ -15,6 +15,16 @@ export interface TreeNode {
   partners: TreeNode[]
   /** All children laid out below this person (regardless of which partner) */
   children: TreeNode[]
+  /**
+   * True when this node is a visual placeholder that points to the person's
+   * real position elsewhere in the tree. Rendered as ReferenceNode, not PersonNode.
+   */
+  isReference?: boolean
+  /**
+   * For reference nodes: the id of the person this node is displayed beside
+   * (the "owner" of the partnership). Used to locate the partnership row for removal.
+   */
+  ownerPersonId?: string
 }
 
 // ── A fully laid-out family root ──────────────────────────────────────────────

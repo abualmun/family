@@ -35,11 +35,13 @@ export function useTreeLayout(
 
   const allPositionedPeople = useMemo(() => {
     return layoutedRoots.flatMap(lr =>
-      lr.allNodes.map(node => ({
-        ...node.person,
-        computedX: node.x,
-        computedY: node.y,
-      }))
+      lr.allNodes
+        .filter(node => !node.isReference)
+        .map(node => ({
+          ...node.person,
+          computedX: node.x,
+          computedY: node.y,
+        }))
     )
   }, [layoutedRoots])
 

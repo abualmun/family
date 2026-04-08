@@ -39,6 +39,10 @@ export function computeLayout(
   const partnerMap = buildPartnerMap(partnerships)
   const childrenMap = buildChildrenMap(parentChildRows)
 
+  // People who appear as a child in parent_child have a natural tree position.
+  // Used by buildTreeNode to decide reference vs full partner node.
+  const childIdsSet = new Set(parentChildRows.map(pc => pc.child_id))
+
   const results: LayoutedRoot[] = []
   let canvasOffsetX = 100 // starting X for the first root
 
@@ -46,8 +50,7 @@ export function computeLayout(
     // Find root person: the person in this root with no parent in parent_child
     // who is also not a shortcut
     const rootPeople = people.filter(p => p.root_id === root.id && !p.is_shortcut)
-    const childIds = new Set(parentChildRows.map(pc => pc.child_id))
-    const rootPerson = rootPeople.find(p => !childIds.has(p.id)) ?? rootPeople[0]
+    const rootPerson = rootPeople.find(p => !childIdsSet.has(p.id)) ?? rootPeople[0]
 
     if (!rootPerson) continue
 
@@ -58,6 +61,7 @@ export function computeLayout(
       peopleById,
       partnerMap,
       childrenMap,
+      childIdsSet,
       visited,
     )
 
@@ -88,19 +92,34 @@ function buildTreeNode(
   peopleById: Map<string, PersonRow>,
   partnerMap: Map<string, string[]>,
   childrenMap: Map<string, string[]>,
+  childIdsSet: Set<string>,
   visited: Set<string>,
 ): TreeNode {
   visited.add(person.id)
 
   // Build partner nodes (laid out horizontally, never recursed into)
   const partnerIds = partnerMap.get(person.id) ?? []
-  const partnerNodes: TreeNode[] = partnerIds
-    .map(pid => peopleById.get(pid))
-    .filter((p): p is PersonRow => !!p && !visited.has(p.id))
-    .map(p => {
+  const partnerNodes: TreeNode[] = []
+  for (const pid of partnerIds) {
+    const p = peopleById.get(pid)
+    if (!p) continue
+
+    if (childIdsSet.has(p.id) || visited.has(p.id)) {
+      // This person is someone's child (has a natural parent-child position in the tree),
+      // or was already placed during this traversal.
+      // Either way, they appear in their own spot — show a reference node here instead
+      // of claiming them as a full partner and losing their original position.
+      partnerNodes.push({ person: p, x: 0, y: 0, partners: [], children: [], isReference: true, ownerPersonId: person.id })
+    } else if (p.root_id !== person.root_id && !p.is_shortcut) {
+      // Real person from a different family — they will have their own full node
+      // in their own root. Show a reference node here instead of duplicating.
+      partnerNodes.push({ person: p, x: 0, y: 0, partners: [], children: [], isReference: true, ownerPersonId: person.id })
+    } else {
+      // Genuinely unplaced partner (new person, no parent, same family): place normally.
       visited.add(p.id)
-      return { person: p, x: 0, y: 0, partners: [], children: [] }
-    })
+      partnerNodes.push({ person: p, x: 0, y: 0, partners: [], children: [] })
+    }
+  }
 
   // Build children nodes recursively.
   // Include children of same-root partners so that a child added through
@@ -108,14 +127,14 @@ function buildTreeNode(
   // the original/father node rather than going orphaned.
   const ownChildIds = childrenMap.get(person.id) ?? []
   const partnerChildIds = partnerNodes
-    .filter(pn => pn.person.root_id === person.root_id)
+    .filter(pn => !pn.isReference && pn.person.root_id === person.root_id)
     .flatMap(pn => childrenMap.get(pn.person.id) ?? [])
   const allChildIds = [...new Set([...ownChildIds, ...partnerChildIds])]
 
   const childNodes: TreeNode[] = allChildIds
     .map(cid => peopleById.get(cid))
     .filter((p): p is PersonRow => !!p && !visited.has(p.id))
-    .map(p => buildTreeNode(p, peopleById, partnerMap, childrenMap, visited))
+    .map(p => buildTreeNode(p, peopleById, partnerMap, childrenMap, childIdsSet, visited))
 
   return { person, x: 0, y: 0, partners: partnerNodes, children: childNodes }
 }

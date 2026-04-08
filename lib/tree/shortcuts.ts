@@ -23,7 +23,8 @@ export function buildShortcutTargetMap(
 
   for (const node of allNodes) {
     if (node.person.is_shortcut && node.person.original_person_id) {
-      // Find the original node
+      // DB shortcut node (cross-family): key = shortcut's id, value = original's position.
+      // handleNavigateToOriginal reaches this via the value-search fallback.
       const originalNode = allNodes.find(
         n => n.person.id === node.person.original_person_id
       )
@@ -32,6 +33,19 @@ export function buildShortcutTargetMap(
           x: originalNode.x,
           y: originalNode.y,
           originalPersonId: originalNode.person.id,
+        })
+      }
+    } else if (node.isReference) {
+      // Virtual reference node (same- or cross-family partner already placed elsewhere).
+      // key = the real person's id so handleNavigateToOriginal finds it via direct lookup.
+      const realNode = allNodes.find(
+        n => n.person.id === node.person.id && !n.isReference
+      )
+      if (realNode) {
+        map.set(node.person.id, {
+          x: realNode.x,
+          y: realNode.y,
+          originalPersonId: realNode.person.id,
         })
       }
     }

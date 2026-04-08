@@ -129,6 +129,13 @@
   border-top-color: #16A34A;
 }
 
+.person-node.reference {
+  background: #FFFBEB;
+  border: 2px dashed #FCD34D;
+  border-top: 5px solid #D97706;
+  opacity: 0.88;
+}
+
 .person-node--male {
   border-top-color: #2563EB;
   background: #EFF6FF;

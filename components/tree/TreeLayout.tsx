@@ -59,10 +59,11 @@ export default function TreeLayout({
   const people          = isEditable ? draft.people          : livePeople.people
   const partnerships    = isEditable ? draft.partnerships    : livePartnerships.partnerships
   const parentChildRows = isEditable ? draft.parentChildRows : liveParentChild.parentChildRows
-  const addRoot         = isEditable ? draft.addRoot         : liveRoots.addRoot
-  const addPerson       = isEditable ? draft.addPerson       : livePeople.addPerson
-  const addPartnership  = isEditable ? draft.addPartnership  : livePartnerships.addPartnership
-  const addParentChild  = isEditable ? draft.addParentChild  : liveParentChild.addParentChild
+  const addRoot            = isEditable ? draft.addRoot            : liveRoots.addRoot
+  const addPerson          = isEditable ? draft.addPerson          : livePeople.addPerson
+  const addPartnership     = isEditable ? draft.addPartnership     : livePartnerships.addPartnership
+  const removePartnership  = isEditable ? draft.removePartnership  : livePartnerships.removePartnership
+  const addParentChild     = isEditable ? draft.addParentChild     : liveParentChild.addParentChild
   const updatePerson    = isEditable ? draft.updatePerson    : livePeople.updatePerson
   const deletePerson    = isEditable ? draft.deletePerson    : livePeople.deletePerson
   const uploadPhoto     = isEditable ? draft.uploadPhoto     : livePeople.uploadPhoto
@@ -276,6 +277,16 @@ export default function TreeLayout({
     panAndHighlight(target.x, target.y, originalPersonId)
   }, [shortcutTargetMap, panAndHighlight])
 
+  // ── Remove partner (from reference node) ─────────────────────
+  const handleRemovePartner = useCallback(async (ownerPersonId: string, refPersonId: string) => {
+    const partnership = partnerships.find(p =>
+      (p.person_a_id === ownerPersonId && p.person_b_id === refPersonId) ||
+      (p.person_b_id === ownerPersonId && p.person_a_id === refPersonId)
+    )
+    if (!partnership) return
+    await removePartnership(partnership.id)
+  }, [partnerships, removePartnership])
+
   const handleCloseModal = useCallback(() => setModal({ type: 'none' }), [])
 
   // ── Enrich positioned people with root_name for search ──────
@@ -329,6 +340,7 @@ export default function TreeLayout({
             onAddPartner={handleAddPartner}
             onAddChild={handleAddChild}
             onNavigateToOriginal={handleNavigateToOriginal}
+            onRemovePartner={handleRemovePartner}
           />
         ))}
       </Canvas>

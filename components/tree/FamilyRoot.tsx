@@ -2,6 +2,7 @@
 
 import PersonNode from '@/components/nodes/PersonNode'
 import ShortcutNode from '@/components/nodes/ShortcutNode'
+import ReferenceNode from '@/components/nodes/ReferenceNode'
 import ConnectorLines from '@/components/tree/ConnectorLines'
 import type { LayoutedRoot } from '@/types'
 
@@ -15,6 +16,7 @@ interface FamilyRootProps {
   onAddPartner: (personId: string) => void
   onAddChild: (personId: string) => void
   onNavigateToOriginal: (originalPersonId: string) => void
+  onRemovePartner: (ownerPersonId: string, refPersonId: string) => void
 }
 
 export default function FamilyRoot({
@@ -27,6 +29,7 @@ export default function FamilyRoot({
   onAddPartner,
   onAddChild,
   onNavigateToOriginal,
+  onRemovePartner,
 }: FamilyRootProps) {
   const { allNodes, edges, partnershipEdges } = layoutedRoot
 
@@ -57,8 +60,23 @@ export default function FamilyRoot({
       </div>
 
       {/* Person nodes */}
-      {allNodes.map(node => {
+      {allNodes.map((node, i) => {
         const person = node.person
+
+        if (node.isReference) {
+          return (
+            <ReferenceNode
+              key={`${person.id}-ref-${i}`}
+              person={person}
+              ownerPersonId={node.ownerPersonId ?? ''}
+              x={node.x}
+              y={node.y}
+              isEditable={isEditable}
+              onNavigateToOriginal={onNavigateToOriginal}
+              onRemovePartner={onRemovePartner}
+            />
+          )
+        }
 
         if (person.is_shortcut) {
           return (

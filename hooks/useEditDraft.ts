@@ -10,7 +10,8 @@ import type {
 type PendingOp =
   | { type: 'addRoot'; tempId: string; name: string }
   | { type: 'addPerson'; tempId: string; data: InsertPerson }
-  | { type: 'addPartnership'; personAId: string; personBId: string }
+  | { type: 'addPartnership'; tempId: string; personAId: string; personBId: string }
+  | { type: 'removePartnership'; id: string }
   | { type: 'addParentChild'; parentId: string; childId: string }
   | { type: 'updatePerson'; id: string; updates: UpdatePerson }
   | { type: 'deletePerson'; id: string }
@@ -89,15 +90,28 @@ export function useEditDraft(
     personBId: string,
   ): Promise<PartnershipRow | null> => {
     const [a, b] = [personAId, personBId].sort()
+    const tempId = makeTempId()
     const temp: PartnershipRow = {
-      id: makeTempId(),
+      id: tempId,
       person_a_id: a,
       person_b_id: b,
       created_at: new Date().toISOString(),
     }
     setPartnerships(prev => [...prev, temp])
-    setPendingOps(prev => [...prev, { type: 'addPartnership', personAId: a, personBId: b }])
+    setPendingOps(prev => [...prev, { type: 'addPartnership', tempId, personAId: a, personBId: b }])
     return temp
+  }, [])
+
+  // ── removePartnership ───────────────────────────────────────
+  const removePartnership = useCallback(async (id: string): Promise<boolean> => {
+    setPartnerships(prev => prev.filter(p => p.id !== id))
+    if (id.startsWith('temp_')) {
+      // Cancel the matching addPartnership pending op instead of writing a delete
+      setPendingOps(prev => prev.filter(op => !(op.type === 'addPartnership' && op.tempId === id)))
+    } else {
+      setPendingOps(prev => [...prev, { type: 'removePartnership', id }])
+    }
+    return true
   }, [])
 
   // ── addParentChild ──────────────────────────────────────────
@@ -269,6 +283,15 @@ export function useEditDraft(
             break
           }
 
+          case 'removePartnership': {
+            const { error } = await supabase
+              .from('partnerships')
+              .delete()
+              .eq('id', op.id)
+            if (error) throw new Error(error.message)
+            break
+          }
+
           case 'addParentChild': {
             const { error } = await supabase
               .from('parent_child')
@@ -344,7 +367,7 @@ export function useEditDraft(
 
   return {
     roots, people, partnerships, parentChildRows,
-    addRoot, addPerson, addPartnership, addParentChild,
+    addRoot, addPerson, addPartnership, removePartnership, addParentChild,
     updatePerson, uploadPhoto, deletePerson, hasConnections,
     saveChanges,
     isSaving,
