@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@netlify/plugin-nextjs": "^5.15.9",
-    "@supabase/ssr": "^0.6.0",
+    "@supabase/ssr": "^0.10.2",
     "@supabase/supabase-js": "^2.49.0",
     "@tailwindcss/postcss": "^4.2.2",
     "next": "^15.0.0",

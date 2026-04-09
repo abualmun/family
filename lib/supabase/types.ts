@@ -11,7 +11,7 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[]
 
-export interface Database {
+export type Database = {
   public: {
     Tables: {
       roots: {
@@ -39,6 +39,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       people: {
         Row: {
@@ -92,6 +93,7 @@ export interface Database {
           created_at?: string
           updated_at?: string
         }
+        Relationships: []
       }
       partnerships: {
         Row: {
@@ -112,6 +114,7 @@ export interface Database {
           person_b_id?: string
           created_at?: string
         }
+        Relationships: []
       }
       parent_child: {
         Row: {
@@ -132,6 +135,7 @@ export interface Database {
           child_id?: string
           created_at?: string
         }
+        Relationships: []
       }
     }
     Views: {
@@ -153,6 +157,7 @@ export interface Database {
           created_at: string
           updated_at: string
         }
+        Relationships: []
       }
       partnerships_detail: {
         Row: {
@@ -163,6 +168,7 @@ export interface Database {
           person_b_name: string
           created_at: string
         }
+        Relationships: []
       }
       parent_child_detail: {
         Row: {
@@ -173,6 +179,7 @@ export interface Database {
           child_name: string
           created_at: string
         }
+        Relationships: []
       }
     }
     Functions: { [_ in never]: never }

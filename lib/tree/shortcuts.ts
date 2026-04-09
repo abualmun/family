@@ -76,6 +76,7 @@ export function buildShortcutPersonData(
     root_id: targetRootId,
     is_shortcut: true,
     original_person_id: originalPerson.id,
+    gender: originalPerson.gender,
     canvas_x: placeholderX,
     canvas_y: placeholderY,
   }
