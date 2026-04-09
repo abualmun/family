@@ -175,8 +175,9 @@ export interface Database {
         }
       }
     }
-    Functions: Record<string, never>
-    Enums: Record<string, never>
+    Functions: { [_ in never]: never }
+    Enums: { [_ in never]: never }
+    CompositeTypes: { [_ in never]: never }
   }
 }
 
