@@ -1,8 +1,7 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import type { UseCanvasReturn } from '@/hooks/useCanvas'
-import ZoomControls from './ZoomControls'
 import Minimap from './Minimap'
 import SearchBar from './SearchBar'
 import type { PersonRow, PartnershipRow, ParentChildRow, RootRow } from '@/lib/supabase/types'
@@ -55,7 +54,6 @@ export default function Canvas({
 
   const {
     canvasInnerRef,
-    transform,
     onMouseDown,
     onMouseMove,
     onMouseUp,
@@ -64,25 +62,7 @@ export default function Canvas({
     onTouchMove,
     onTouchEnd,
     onWheel,
-    zoomIn,
-    zoomOut,
-    fitToScreen,
-    MIN_SCALE,
-    MAX_SCALE,
   } = canvas
-
-  // ── Fit to screen ─────────────────────────────────────────
-  const handleFitToScreen = useCallback(() => {
-    if (people.length === 0) return
-    let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
-    for (const p of people) {
-      minX = Math.min(minX, p.computedX)
-      minY = Math.min(minY, p.computedY)
-      maxX = Math.max(maxX, p.computedX + 160)
-      maxY = Math.max(maxY, p.computedY + 80)
-    }
-    fitToScreen(maxX - minX, maxY - minY, viewport.width, viewport.height)
-  }, [people, viewport, fitToScreen])
 
   // ── Block native scroll on canvas ────────────────────────
   useEffect(() => {
@@ -113,22 +93,6 @@ export default function Canvas({
           people={people}
           onSelectPerson={(x, y, id) => onSearchSelect?.(x, y, id)}
         />
-      )}
-
-      {/* ── Edit mode badge (top center, replaces search in edit mode) ── */}
-      {isEditable && (
-        <div
-          data-no-pan
-          className="
-            absolute top-4 left-1/2 -translate-x-1/2 z-20
-            flex items-center gap-2.5 px-7 py-4
-            bg-walnut text-white text-lg font-sans font-semibold
-            rounded-full shadow-md select-none
-          "
-        >
-          <span className="w-2.5 h-2.5 rounded-full bg-gold animate-pulse" />
-          وضع التعديل
-        </div>
       )}
 
       {/* ── Infinite canvas inner ── */}
@@ -179,15 +143,6 @@ export default function Canvas({
         viewportHeight={viewport.height}
       /> */}
 
-      {/* ── Zoom controls ── */}
-      <ZoomControls
-        scale={transform.scale}
-        minScale={MIN_SCALE}
-        maxScale={MAX_SCALE}
-        onZoomIn={zoomIn}
-        onZoomOut={zoomOut}
-        onFitToScreen={handleFitToScreen}
-      />
     </div>
   )
 }

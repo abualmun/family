@@ -73,17 +73,11 @@ export default function EditToolbar({
                 )}
             </div>
 
-            {/* ── Bottom toolbar (add root + hint) ── */}
+            {/* ── Bottom toolbar (add root) ── */}
             <div
                 data-no-pan
-                className="
-                    absolute bottom-6 left-1/2 -translate-x-1/2 z-20
-                    flex items-center gap-3
-                    bg-white
-                    border-2 border-slate-200
-                    rounded-2xl shadow-popup
-                    px-5 py-4
-                "
+                className="absolute left-1/2 -translate-x-1/2 z-20"
+                style={{ bottom: 'calc(1.5rem + env(safe-area-inset-bottom, 0px))' }}
             >
                 {/* Add root */}
                 <button
@@ -98,20 +92,12 @@ export default function EditToolbar({
                         shadow-sm
                     "
                 >
-                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+                    <svg width="20" height="20" viewBox="0 0 18 18" fill="none">
                         <circle cx="9" cy="9" r="7.5" stroke="currentColor" strokeWidth="1.8" />
                         <path d="M9 5v8M5 9h8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
                     </svg>
-                    إضافة جذر عائلي
+                    جذر جديد
                 </button>
-
-                {/* Divider */}
-                <div className="w-0.5 h-7 bg-slate-200" />
-
-                {/* Hint text */}
-                <p className="font-sans text-base text-walnut-light pr-1 select-none">
-                    مرّر على عقدة لإضافة شركاء أو أبناء
-                </p>
             </div>
         </>
     )

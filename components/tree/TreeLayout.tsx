@@ -15,6 +15,7 @@ import { useParentChild } from '@/hooks/useParentChild'
 import { useEditDraft } from '@/hooks/useEditDraft'
 import { useTreeLayout } from '@/hooks/useTreeLayout'
 import { useCanvas } from '@/hooks/useCanvas'
+import { NODE_WIDTH, NODE_HEIGHT } from '@/lib/tree/layout'
 import type { PersonRow, PartnershipRow, ParentChildRow, RootRow } from '@/lib/supabase/types'
 import type { PersonFormValues } from '@/types'
 
@@ -77,7 +78,17 @@ export default function TreeLayout({
   // ── Canvas ──────────────────────────────────────────────────
   const canvas = useCanvas()
   const { panTo } = canvas
-  const [viewport] = useState({ width: 1440, height: 900 })
+
+  // Track actual viewport dimensions so panTo works correctly on all screen sizes
+  const [viewport, setViewport] = useState({
+    width: typeof window !== 'undefined' ? window.innerWidth : 1440,
+    height: typeof window !== 'undefined' ? window.innerHeight : 900,
+  })
+  useEffect(() => {
+    const update = () => setViewport({ width: window.innerWidth, height: window.innerHeight })
+    window.addEventListener('resize', update)
+    return () => window.removeEventListener('resize', update)
+  }, [])
 
   // ── UI state ────────────────────────────────────────────────
   const [selectedPersonId, setSelectedPersonId] = useState<string | null>(null)
@@ -250,15 +261,16 @@ export default function TreeLayout({
 
     setModal({ type: 'none' })
 
-    // Pan to the new root
+    // Pan to the center of the new root node
     setTimeout(() => {
-      panTo(maxX, 100, viewport.width, viewport.height, true)
+      panTo(maxX + NODE_WIDTH / 2, 100 + NODE_HEIGHT / 2, viewport.width, viewport.height, true)
     }, 300)
   }, [roots, addRoot, addPerson, panTo, viewport])
 
   // ── Shared: pan + delayed highlight ─────────────────────────
   const panAndHighlight = useCallback((x: number, y: number, id: string) => {
-    panTo(x, y, viewport.width, viewport.height, true)
+    // Pan to the center of the node, not its top-left corner
+    panTo(x + NODE_WIDTH / 2, y + NODE_HEIGHT / 2, viewport.width, viewport.height, true)
     if (highlightDelayRef.current) clearTimeout(highlightDelayRef.current)
     if (highlightTimerRef.current) clearTimeout(highlightTimerRef.current)
     setHighlightedPersonId(null)
